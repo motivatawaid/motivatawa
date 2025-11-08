@@ -22,74 +22,113 @@ class DashboardController extends Controller
 
         $data = [];
 
-        if (in_array($role, ['superadmin', 'admin'])) {
-            // Dashboard untuk Superadmin dan Admin
-            $data['totalUsers'] = User::whereNotIn('role', ['superadmin', 'admin'])->count();
-            $data['totalEvents'] = Event::count();
-            $data['totalCourses'] = Course::count();
-            $data['totalVideos'] = Video::count();
-            $data['totalRevenue'] = Ticket::where('status', 'purchased')->sum('price_paid')
-                + Registration::where('status', 'purchased')->sum('price_paid')
-                + Purchase::where('status', 'purchased')->sum('price_paid');
-            $data['recentEvents'] = Event::with('talent')->latest()->take(5)->get();
-            $data['recentCourses'] = Course::with('talent')->latest()->take(5)->get();
-            $data['recentVideos'] = Video::with('talent')->latest()->take(5)->get();
-        } elseif ($role === 'talent') {
-            // Dashboard untuk Talent
-            $data['totalEvents'] = Event::where('talent_id', $user->id)->count();
-            $data['totalCourses'] = Course::where('talent_id', $user->id)->count();
-            $data['totalVideos'] = Video::where('talent_id', $user->id)->count();
+        if (in_array($role, ['admin', 'talent'])) {
+            // Dashboard untuk Admin dan Talent - format tampilan sama
+            if ($role === 'admin') {
+                // Admin melihat data keseluruhan
+                $data['totalEvents'] = Event::count();
+                $data['totalCourses'] = Course::count();
+                $data['totalVideos'] = Video::count();
 
-            // Hitung total ticket sales
-            $data['totalTicketSales'] = Ticket::whereHas('event', function ($query) use ($user) {
-                $query->where('talent_id', $user->id);
-            })->where('status', 'purchased')->count();
+                // Hitung total ticket sales untuk semua talent
+                $data['totalTicketSales'] = Ticket::where('status', 'purchased')->count();
 
-            // Hitung total registration sales
-            $data['totalRegistrationSales'] = Registration::whereHas('course', function ($query) use ($user) {
-                $query->where('talent_id', $user->id);
-            })->where('status', 'purchased')->count();
+                // Hitung total registration sales untuk semua talent
+                $data['totalRegistrationSales'] = Registration::where('status', 'purchased')->count();
 
-            // Hitung total revenue
-            $data['totalRevenue'] = Ticket::where('status', 'purchased')
-                ->whereHas('event', function ($query) use ($user) {
-                    $query->where('talent_id', $user->id);
-                })->sum('price_paid')
-                + Registration::where('status', 'purchased')
-                ->whereHas('course', function ($query) use ($user) {
-                    $query->where('talent_id', $user->id);
-                })->sum('price_paid')
-                + Purchase::where('status', 'purchased')
-                ->whereHas('video', function ($query) use ($user) {
-                    $query->where('talent_id', $user->id);
-                })->sum('price_paid');
+                // Hitung total video sales untuk semua talent
+                $data['totalVideoSales'] = Purchase::where('status', 'purchased')->count();
 
-            // My Events dengan count tickets yang purchased
-            $data['myEvents'] = Event::where('talent_id', $user->id)
-                ->withCount(['tickets as tickets_count' => function ($query) {
+                // Hitung total revenue untuk semua talent
+                $data['totalRevenue'] = Ticket::where('status', 'purchased')->sum('price_paid')
+                    + Registration::where('status', 'purchased')->sum('price_paid')
+                    + Purchase::where('status', 'purchased')->sum('price_paid');
+
+                // Data events dengan count tickets yang purchased untuk semua
+                $data['myEvents'] = Event::withCount(['tickets as tickets_count' => function ($query) {
                     $query->where('status', 'purchased');
                 }])
-                ->latest()
-                ->take(5)
-                ->get();
+                    ->latest()
+                    ->take(5)
+                    ->get();
 
-            // My Courses dengan count registrations yang purchased
-            $data['myCourses'] = Course::where('talent_id', $user->id)
-                ->withCount(['registrations as registrations_count' => function ($query) {
+                // Data courses dengan count registrations yang purchased untuk semua
+                $data['myCourses'] = Course::withCount(['registrations as registrations_count' => function ($query) {
                     $query->where('status', 'purchased');
                 }])
-                ->latest()
-                ->take(5)
-                ->get();
+                    ->latest()
+                    ->take(5)
+                    ->get();
 
-            // My Videos dengan count purchases yang purchased
-            $data['myVideos'] = Video::where('talent_id', $user->id)
-                ->withCount(['purchases as purchases_count' => function ($query) {
+                // Data videos dengan count purchases yang purchased untuk semua
+                $data['myVideos'] = Video::withCount(['purchases as purchases_count' => function ($query) {
                     $query->where('status', 'purchased');
                 }])
-                ->latest()
-                ->take(5)
-                ->get();
+                    ->latest()
+                    ->take(5)
+                    ->get();
+            } else {
+                // Talent hanya melihat data miliknya sendiri
+                $data['totalEvents'] = Event::where('talent_id', $user->id)->count();
+                $data['totalCourses'] = Course::where('talent_id', $user->id)->count();
+                $data['totalVideos'] = Video::where('talent_id', $user->id)->count();
+
+                // Hitung total ticket sales untuk talent ini saja
+                $data['totalTicketSales'] = Ticket::whereHas('event', function ($query) use ($user) {
+                    $query->where('talent_id', $user->id);
+                })->where('status', 'purchased')->count();
+
+                // Hitung total registration sales untuk talent ini saja
+                $data['totalRegistrationSales'] = Registration::whereHas('course', function ($query) use ($user) {
+                    $query->where('talent_id', $user->id);
+                })->where('status', 'purchased')->count();
+
+                // Hitung total video sales untuk talent ini saja
+                $data['totalVideoSales'] = Purchase::whereHas('video', function ($query) use ($user) {
+                    $query->where('talent_id', $user->id);
+                })->where('status', 'purchased')->count();
+
+                // Hitung total revenue untuk talent ini saja
+                $data['totalRevenue'] = Ticket::where('status', 'purchased')
+                    ->whereHas('event', function ($query) use ($user) {
+                        $query->where('talent_id', $user->id);
+                    })->sum('price_paid')
+                    + Registration::where('status', 'purchased')
+                    ->whereHas('course', function ($query) use ($user) {
+                        $query->where('talent_id', $user->id);
+                    })->sum('price_paid')
+                    + Purchase::where('status', 'purchased')
+                    ->whereHas('video', function ($query) use ($user) {
+                        $query->where('talent_id', $user->id);
+                    })->sum('price_paid');
+
+                // My Events dengan count tickets yang purchased untuk talent ini saja
+                $data['myEvents'] = Event::where('talent_id', $user->id)
+                    ->withCount(['tickets as tickets_count' => function ($query) {
+                        $query->where('status', 'purchased');
+                    }])
+                    ->latest()
+                    ->take(5)
+                    ->get();
+
+                // My Courses dengan count registrations yang purchased untuk talent ini saja
+                $data['myCourses'] = Course::where('talent_id', $user->id)
+                    ->withCount(['registrations as registrations_count' => function ($query) {
+                        $query->where('status', 'purchased');
+                    }])
+                    ->latest()
+                    ->take(5)
+                    ->get();
+
+                // My Videos dengan count purchases yang purchased untuk talent ini saja
+                $data['myVideos'] = Video::where('talent_id', $user->id)
+                    ->withCount(['purchases as purchases_count' => function ($query) {
+                        $query->where('status', 'purchased');
+                    }])
+                    ->latest()
+                    ->take(5)
+                    ->get();
+            }
         } elseif ($role === 'user') {
             // Dashboard untuk User
             $data['totalTickets'] = Ticket::where('user_id', $user->id)->where('status', 'purchased')->count();
