@@ -38,16 +38,16 @@
                 <span>Kelola Events</span>
             </a>
         </li>
-        <li class="{{ request()->routeIs('courses.*') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('courses.index') }}">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Kelola Courses</span>
-            </a>
-        </li>
         <li class="{{ request()->routeIs('tickets.*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('tickets.index') }}">
                 <i class="fas fa-ticket-alt"></i>
                 <span>Kelola Tickets</span>
+            </a>
+        </li>
+        <li class="{{ request()->routeIs('courses.*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('courses.index') }}">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Kelola Courses</span>
             </a>
         </li>
         <li class="{{ request()->routeIs('registrations.*') ? 'active' : '' }}">
@@ -73,40 +73,40 @@
         {{-- sidebar user --}}
         @can('user')
         <li class="menu-header">Peserta</li>
-        <li class="{{ request()->routeIs('user.events.index') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('user.events.index') }}">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Events</span>
-            </a>
-        </li>
-        <li class="{{ request()->routeIs('user.courses.index') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('user.courses.index') }}">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Courses</span>
-            </a>
-        </li>
+        {{--  <li class="{{ request()->routeIs('user.events.index') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('user.events.index') }}">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Events</span>
+        </a>
+        </li> --}}
         <li class="{{ request()->routeIs('user.tickets.index') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('user.tickets.index') }}">
                 <i class="fas fa-ticket-alt"></i>
                 <span>Tickets</span>
             </a>
         </li>
+        {{--  <li class="{{ request()->routeIs('user.courses.index') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('user.courses.index') }}">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Courses</span>
+        </a>
+        </li> --}}
         <li class="{{ request()->routeIs('user.registrations.index') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('user.registrations.index') }}">
                 <i class="fas fa-user-graduate"></i>
                 <span>Registrations</span>
             </a>
         </li>
-        <li class="{{ request()->routeIs('user.videos.index') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('user.videos.index') }}">
-                <i class="fas fa-video"></i>
-                <span>Videos</span>
-            </a>
-        </li>
+        {{--  <li class="{{ request()->routeIs('user.videos.index') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('user.videos.index') }}">
+            <i class="fas fa-video"></i>
+            <span>Videos</span>
+        </a>
+        </li> --}}
         <li class="{{ request()->routeIs('user.purchases.index') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('user.purchases.index') }}">
                 <i class="fas fa-shopping-cart"></i>
-                <span>Purchases</span>
+                <span>Videos</span>
             </a>
         </li>
         @endcan
