@@ -9,7 +9,7 @@
 @if(in_array(auth()->user()->role, ['admin']))
 {{-- Dashboard Superadmin & Admin --}}
 <div class="row">
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-primary bg-primary">
                 <i class="fas fa-users"></i>
@@ -24,7 +24,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-success bg-success">
                 <i class="fas fa-calendar-alt"></i>
@@ -39,7 +39,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-info bg-info">
                 <i class="fas fa-graduation-cap"></i>
@@ -54,7 +54,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-warning bg-warning">
                 <i class="fas fa-video"></i>
@@ -69,7 +69,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-danger bg-danger">
                 <i class="fas fa-dollar-sign"></i>
@@ -205,7 +205,7 @@
 @elseif(auth()->user()->role === 'talent')
 {{-- Dashboard Talent --}}
 <div class="row">
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-primary bg-primary">
                 <i class="fas fa-calendar-alt"></i>
@@ -220,7 +220,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-success bg-success">
                 <i class="fas fa-graduation-cap"></i>
@@ -235,7 +235,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-info bg-info">
                 <i class="fas fa-video"></i>
@@ -250,7 +250,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-warning bg-warning">
                 <i class="fas fa-dollar-sign"></i>
@@ -265,7 +265,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-primary bg-primary">
                 <i class="fas fa-ticket-alt"></i>
@@ -280,7 +280,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card card-statistic-2">
             <div class="card-icon shadow-success bg-success">
                 <i class="fas fa-user-graduate"></i>
