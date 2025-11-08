@@ -1,25 +1,41 @@
 @extends('layouts.app')
 
-@section('title', 'Checkout Video')
-@section('desc', 'Selesaikan pembayaran video premium')
+@section('title', 'Checkout Course')
+@section('desc', 'Selesaikan pembayaran course Anda')
 
 @section('content')
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h4>Checkout Video Premium</h4>
+                <h4>Checkout Course</h4>
             </div>
             <div class="card-body">
                 <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> Selesaikan pembayaran untuk mendapatkan akses video ini.
+                    <i class="fas fa-info-circle"></i> Selesaikan pembayaran untuk mendapatkan akses course Anda.
                 </div>
 
                 <div class="row">
-                    <div class="col-12">
-                        <h5>{{ $video->title }}</h5>
-                        <p class="text-muted">{{ $video->talent->name }}</p>
-                        <p>{{ $video->description }}</p>
+                    <div class="col-md-6">
+                        @if($course->thumbnail)
+                        <img src="{{ Storage::url($course->thumbnail) }}" class="img-fluid rounded mb-3"
+                            alt="{{ $course->name }}">
+                        @endif
+                    </div>
+                    <div class="col-md-6">
+                        <h5>{{ $course->name }}</h5>
+                        <p class="text-muted">{{ $course->talent->name }}</p>
+
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><i class="fas fa-graduation-cap"></i> Tipe</td>
+                                <td>: Online Course</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-users"></i> Kuota</td>
+                                <td>: {{ $course->quota }} peserta</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
 
@@ -30,12 +46,12 @@
                         <h6>Detail Pembayaran</h6>
                         <table class="table">
                             <tr>
-                                <td>Harga Video</td>
-                                <td class="text-right">Rp {{ number_format($video->price, 0, ',', '.') }}</td>
+                                <td>Harga Course</td>
+                                <td class="text-right">Rp {{ number_format($course->price, 0, ',', '.') }}</td>
                             </tr>
                             <tr class="font-weight-bold">
                                 <td>Total</td>
-                                <td class="text-right">Rp {{ number_format($video->price, 0, ',', '.') }}</td>
+                                <td class="text-right">Rp {{ number_format($course->price, 0, ',', '.') }}</td>
                             </tr>
                         </table>
                     </div>
@@ -45,8 +61,8 @@
                     <button type="button" class="btn btn-primary btn-lg btn-block" id="pay-button">
                         <i class="fas fa-credit-card"></i> Bayar Sekarang
                     </button>
-                    <a href="{{ route('user.videos.index') }}" class="btn btn-secondary btn-block">
-                        <i class="fas fa-arrow-left"></i> Kembali
+                    <a href="{{ route('user.courses.index') }}" class="btn btn-secondary btn-block">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Course
                     </a>
                 </div>
             </div>
@@ -74,8 +90,8 @@
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    type: 'video',
-                    item_id: {{ $purchase->id }}
+                    type: 'registration',
+                    item_id: {{ $registration->id }}
                 })
             })
             .then(response => {
@@ -107,9 +123,9 @@
                             .then(syncData => {
                                 console.log('Sync Response:', syncData);
                                 if (syncData.success && syncData.status === 'success') {
-                                    alert('Pembayaran berhasil! Akses video Anda telah aktif.');
+                                    alert('Pembayaran berhasil! Akses course Anda telah aktif dan siap digunakan.');
                                 } else {
-                                    alert('Pembayaran berhasil, status video sedang diproses. Cek riwayat sebentar lagi.');
+                                    alert('Pembayaran berhasil, status course sedang diproses. Cek riwayat sebentar lagi.');
                                 }
                             })
                             .catch(syncError => {
@@ -117,13 +133,13 @@
                                 alert('Pembayaran berhasil! (Update status otomatis sebentar lagi)');
                             })
                             .finally(() => {
-                                window.location.href = '{{ route("user.purchases.index") }}';
+                                window.location.href = '{{ route("user.registrations.index") }}';
                             });
                         },
                         onPending: function(result) {
                             console.log('Payment Pending:', result);
                             alert('Pembayaran menunggu konfirmasi...');
-                            window.location.href = '{{ route("user.purchases.index") }}';
+                            window.location.href = '{{ route("user.registrations.index") }}';
                         },
                         onError: function(result) {
                             console.log('Payment Error:', result);

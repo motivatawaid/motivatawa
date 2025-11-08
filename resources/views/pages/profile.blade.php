@@ -48,6 +48,26 @@
                         </div>
                         @enderror
                     </div>
+                    <div class="form-group">
+                        <label for="whatsapp_number">WhatsApp Number</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">+62</span>
+                            </div>
+                            <input type="tel" id="whatsapp_number" name="whatsapp_number"
+                                class="form-control @error('whatsapp_number', 'updateProfileInformation') is-invalid @enderror"
+                                value="{{ old('whatsapp_number', auth()->user()->whatsapp_number) }}"
+                                placeholder="81234567890">
+                        </div>
+                        <small class="form-text text-muted">
+                            Contoh: 81234567890 (tanpa +62)
+                        </small>
+                        @error('whatsapp_number', 'updateProfileInformation')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                        @enderror
+                    </div>
                 </div>
                 <div class="card-footer text-right">
                     <button class="btn btn-primary">Simpan Profil</button>

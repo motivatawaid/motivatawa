@@ -35,13 +35,26 @@ class CreateNewUser implements CreatesNewUsers
                 'min:3',
                 Rule::unique(User::class)
             ],
+            'whatsapp_number' => [
+                'required',
+                'string',
+                'max:15',
+                'regex:/^[0-9]+$/',
+                Rule::unique(User::class)
+            ],
             'password' => $this->passwordRules(),
+        ], [
+            'whatsapp_number.required' => 'Nomor WhatsApp wajib diisi.',
+            'whatsapp_number.max' => 'Nomor WhatsApp maksimal 15 digit.',
+            'whatsapp_number.regex' => 'Nomor WhatsApp hanya boleh berisi angka.',
+            'whatsapp_number.unique' => 'Nomor WhatsApp sudah digunakan.',
         ])->validate();
 
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'username' => $input['username'],
+            'whatsapp_number' => $input['whatsapp_number'],
             'password' => Hash::make($input['password']),
         ]);
     }

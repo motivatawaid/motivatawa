@@ -40,15 +40,36 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input value="{{ old('email') }}" id="email" type="text"
-                                    class="form-control @error('email') is-invalid @enderror" name="email">
-                                @error('email')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="email">Email</label>
+                                    <input value="{{ old('email') }}" id="email" type="email"
+                                        class="form-control @error('email') is-invalid @enderror" name="email">
+                                    @error('email')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
                                 </div>
-                                @enderror
+                                <div class="form-group col-md-6">
+                                    <label for="whatsapp_number">WhatsApp Number</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">+62</span>
+                                        </div>
+                                        <input value="{{ old('whatsapp_number') }}" id="whatsapp_number" type="tel"
+                                            class="form-control @error('whatsapp_number') is-invalid @enderror"
+                                            name="whatsapp_number" placeholder="81234567890">
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Contoh: 81234567890 (tanpa +62)
+                                    </small>
+                                    @error('whatsapp_number')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-6">

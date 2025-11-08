@@ -85,6 +85,8 @@
                                 class="font-medium hover:text-primary transition-colors">Beranda</a></li>
                         <li><a href="{{ url('/all-event') }}"
                                 class="font-medium hover:text-primary transition-colors">Event</a></li>
+                        <li><a href="{{ url('/all-course') }}"
+                                class="font-medium hover:text-primary transition-colors">Course</a></li>
                         <li><a href="{{ url('/all-video') }}"
                                 class="font-medium hover:text-primary transition-colors">Video</a></li>
                         <li><a href="{{ url('/') }}#features"
@@ -327,7 +329,7 @@
     </div>
 
     <!-- Midtrans Snap -->
-    <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
+    <script src="{{ config('midtrans.url') }}" data-client-key="{{ config('midtrans.client_key') }}">
     </script>
 
     <script>

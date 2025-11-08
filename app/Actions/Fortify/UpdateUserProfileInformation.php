@@ -33,6 +33,18 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'min:3',
                 Rule::unique('users')->ignore($user->id)
             ],
+            'whatsapp_number' => [
+                'required',
+                'string',
+                'max:15',
+                'regex:/^[0-9]+$/',
+                Rule::unique('users')->ignore($user->id)
+            ],
+        ], [
+            'whatsapp_number.required' => 'Nomor WhatsApp wajib diisi.',
+            'whatsapp_number.max' => 'Nomor WhatsApp maksimal 15 digit.',
+            'whatsapp_number.regex' => 'Nomor WhatsApp hanya boleh berisi angka.',
+            'whatsapp_number.unique' => 'Nomor WhatsApp sudah digunakan.',
         ])->validateWithBag('updateProfileInformation');
 
         if (
@@ -45,6 +57,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'username' => $input['username'],
+                'whatsapp_number' => $input['whatsapp_number'],
             ])->save();
         }
     }
@@ -59,6 +72,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         $user->forceFill([
             'name' => $input['name'],
             'email' => $input['email'],
+            'username' => $input['username'],
+            'whatsapp_number' => $input['whatsapp_number'],
             'email_verified_at' => null,
         ])->save();
 

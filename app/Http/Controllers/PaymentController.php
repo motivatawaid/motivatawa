@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Midtrans\Config;
 use App\Models\Ticket;
 use App\Models\Purchase;
+use App\Models\Registration;
 use Illuminate\Support\Str;
 use Midtrans\Snap;
 use Illuminate\Support\Facades\Log;
@@ -29,7 +30,7 @@ class PaymentController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:ticket,video',
+                'type' => 'required|in:ticket,registration,video',
                 'item_id' => 'required|integer',
             ]);
 
@@ -53,6 +54,21 @@ class PaymentController extends Controller
 
                 $amount = $item->event->price;
                 $name = $item->event->title;
+            } elseif ($type === 'registration') {
+                $item = Registration::where('id', $itemId)
+                    ->where('user_id', $user->id)
+                    ->with('course')
+                    ->first();
+
+                if (!$item || !$item->course) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'Registrasi tidak ditemukan'
+                    ], 404);
+                }
+
+                $amount = $item->course->price;
+                $name = $item->course->name;
             } else {
                 $item = Purchase::where('id', $itemId)
                     ->where('user_id', $user->id)
@@ -140,20 +156,24 @@ class PaymentController extends Controller
             $fraudStatus = strtolower($statusData->fraud_status ?? '');
             $paymentType = $statusData->payment_type ?? '';
 
-            // Cari model (ticket atau purchase) dengan eager load
+            // Cari model (ticket, registration, atau purchase) dengan eager load
             $ticket = Ticket::with('event')->where('midtrans_order_id', $orderId)->first();
+            $registration = Registration::with('course')->where('midtrans_order_id', $orderId)->first();
             $purchase = Purchase::with('video')->where('midtrans_order_id', $orderId)->first();
-            $model = $ticket ?: $purchase;
+
+            $model = $ticket ?: ($registration ?: $purchase);
 
             if (!$model) {
                 Log::warning('Model not found for order_id: ' . $orderId);
                 return response()->json(['success' => false, 'error' => 'Order tidak ditemukan'], 404);
             }
 
-            $user = $model->user; // Pastikan relasi user ada di model Ticket dan Purchase
-            $amount = $ticket?->event?->price ?? $purchase?->video?->price ?? 0;
-            $itemName = $ticket?->event?->title ?? $purchase?->video?->title ?? '';
-            $type = $ticket ? 'ticket' : 'video';
+            $user = $model->user; // Pastikan relasi user ada di model
+            $amount = $ticket?->event?->price ?? $registration?->course?->price ?? $purchase?->video?->price ?? 0;
+            $itemName = $ticket?->event?->title ?? $registration?->course?->name ?? $purchase?->video?->title ?? '';
+
+            // Tentukan tipe untuk email
+            $type = $ticket ? 'ticket' : ($registration ? 'registration' : 'video');
 
             // Idempotent: Jika sudah 'purchased', skip
             if ($model->status === 'purchased') {
@@ -179,8 +199,12 @@ class PaymentController extends Controller
                     'midtrans_status' => $status
                 ]);
 
+                // Kurangi quota untuk event dan course
                 if ($ticket && $amount > 0) {
                     $ticket->event->decrement('quota');
+                }
+                if ($registration && $amount > 0) {
+                    $registration->course->decrement('quota');
                 }
 
                 // 🔥 KIRIM EMAIL KONFIRMASI
@@ -205,7 +229,14 @@ class PaymentController extends Controller
                 }
 
                 Log::info('Manual verify success - Updated to purchased', ['order_id' => $orderId, 'amount' => $amount]);
-                $message = $ticket ? 'Tiket Anda telah aktif!' : 'Akses video Anda telah aktif!';
+
+                // Pesan sukses berdasarkan tipe
+                $message = match ($type) {
+                    'ticket' => 'Tiket Anda telah aktif!',
+                    'registration' => 'Registrasi course Anda telah aktif!',
+                    'video' => 'Akses video Anda telah aktif!',
+                    default => 'Pembelian Anda telah aktif!'
+                };
             } elseif ($status === 'failed') {
                 $model->update(['status' => 'cancelled', 'midtrans_status' => $status]);
                 Log::info('Manual verify failed', ['order_id' => $orderId]);

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Event;
 use App\Models\Purchase;
+use App\Models\Registration;
 use App\Models\Ticket;
 use App\Models\Video;
 use App\Models\User;
@@ -24,7 +26,7 @@ class HomeController extends Controller
     }
 
     /**
-     * Tampilkan halaman utama dengan event dan video terbaru
+     * Tampilkan halaman utama dengan event, course dan video terbaru
      */
     public function index(Request $request)
     {
@@ -34,6 +36,14 @@ class HomeController extends Controller
                 $query->where('status', 'purchased');
             }])
             ->orderBy('start_date', 'asc')
+            ->take(6)
+            ->get();
+
+        // Ambil course terbaru (batasi 6)
+        $latestCourses = Course::with(['talent', 'registrations' => function ($query) {
+            $query->where('status', 'purchased');
+        }])
+            ->orderBy('created_at', 'desc')
             ->take(6)
             ->get();
 
@@ -61,6 +71,21 @@ class HomeController extends Controller
                 $event->sold_tickets = $event->sold_tickets;
             });
 
+            // Tambahkan status pembelian untuk setiap course
+            $latestCourses->each(function ($course) use ($user) {
+                $registration = $user->registrations()
+                    ->where('course_id', $course->id)
+                    ->where('status', 'purchased')
+                    ->first();
+
+                $course->is_purchased = $registration ? true : false;
+                $course->registration_id = $registration ? $registration->id : null;
+
+                // Hitung sisa quota
+                $course->remaining_quota = $course->remaining_quota;
+                $course->sold_registrations = $course->sold_registrations;
+            });
+
             // Tambahkan status pembelian untuk setiap video
             $latestVideos->each(function ($video) use ($user) {
                 $purchase = $user->purchases()
@@ -77,9 +102,14 @@ class HomeController extends Controller
                 $event->remaining_quota = $event->remaining_quota;
                 $event->sold_tickets = $event->sold_tickets;
             });
+
+            $latestCourses->each(function ($course) {
+                $course->remaining_quota = $course->remaining_quota;
+                $course->sold_registrations = $course->sold_registrations;
+            });
         }
 
-        return view('home', compact('upcomingEvents', 'latestVideos'));
+        return view('home', compact('upcomingEvents', 'latestCourses', 'latestVideos'));
     }
 
     /**
@@ -116,6 +146,42 @@ class HomeController extends Controller
         }
 
         return view('events.all', compact('events'));
+    }
+
+    /**
+     * Tampilkan semua course yang tersedia
+     */
+    public function allCourse(Request $request)
+    {
+        $courses = Course::with(['talent', 'registrations' => function ($query) {
+            $query->where('status', 'purchased');
+        }])
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        // Hitung sisa quota untuk setiap course
+        $courses->getCollection()->transform(function ($course) {
+            $course->remaining_quota = $course->remaining_quota;
+            $course->sold_registrations = $course->sold_registrations;
+            return $course;
+        });
+
+        // Jika user sudah login, cek status pembelian
+        if ($request->user()) {
+            $user = $request->user();
+
+            $courses->each(function ($course) use ($user) {
+                $registration = $user->registrations()
+                    ->where('course_id', $course->id)
+                    ->where('status', 'purchased')
+                    ->first();
+
+                $course->is_purchased = $registration ? true : false;
+                $course->registration_id = $registration ? $registration->id : null;
+            });
+        }
+
+        return view('courses.all', compact('courses'));
     }
 
     /**
@@ -156,9 +222,6 @@ class HomeController extends Controller
         Config::$is3ds = config('midtrans.is_3ds', true);
     }
 
-    /**
-     * Get event data for API
-     */
     /**
      * Get event data for API
      */
@@ -207,6 +270,55 @@ class HomeController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Terjadi kesalahan saat mengambil data event.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get course data for API
+     */
+    public function getCourse(Course $course)
+    {
+        try {
+            // Get talent data separately
+            $talent = null;
+            if ($course->talent_id) {
+                $talent = User::find($course->talent_id);
+            }
+
+            // Hitung sisa quota
+            $remainingQuota = $course->remaining_quota;
+            $soldRegistrations = $course->sold_registrations;
+
+            // Format the response data
+            $responseData = [
+                'id' => $course->id,
+                'name' => $course->name,
+                'description' => $course->description,
+                'quota' => $course->quota,
+                'remaining_quota' => $remainingQuota,
+                'sold_registrations' => $soldRegistrations,
+                'has_available_quota' => $remainingQuota > 0,
+                'price' => $course->price,
+                'price_formatted' => $course->price_formatted,
+                'thumbnail' => $course->thumbnail,
+                'talent' => $talent ? [
+                    'id' => $talent->id,
+                    'name' => $talent->name,
+                ] : null,
+                'created_at' => $course->created_at,
+                'updated_at' => $course->updated_at,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $responseData
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching course: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Terjadi kesalahan saat mengambil data course.'
             ], 500);
         }
     }
@@ -325,6 +437,84 @@ class HomeController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Terjadi kesalahan saat memproses pembelian. Silakan coba lagi.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Create registration for course purchase (untuk pembelian dari home)
+     */
+    public function createCourseRegistration(Request $request, Course $course)
+    {
+        try {
+            $user = $request->user();
+
+            // Validasi user sudah login
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Silakan login terlebih dahulu.'
+                ], 401);
+            }
+
+            // Validasi nomor WhatsApp
+            if (!$user->whatsapp_number) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Nomor WhatsApp belum diisi.',
+                    'redirect_url' => '/profile' // Tambahkan URL redirect
+                ], 400);
+            }
+
+            // Validasi quota
+            if ($course->quota <= 0) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Maaf, kuota untuk course ini sudah habis.'
+                ], 400);
+            }
+
+            // Cek apakah user sudah memiliki registration yang purchased
+            $existingRegistration = $user->registrations()
+                ->where('course_id', $course->id)
+                ->where('status', 'purchased')
+                ->first();
+
+            if ($existingRegistration) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Anda sudah terdaftar untuk course ini.'
+                ], 400);
+            }
+
+            // Cari atau buat registration pending
+            $registration = $user->registrations()
+                ->where('course_id', $course->id)
+                ->where('status', 'pending')
+                ->first();
+
+            if (!$registration) {
+                $registration = DB::transaction(function () use ($user, $course) {
+                    return Registration::create([
+                        'course_id' => $course->id,
+                        'user_id' => $user->id,
+                        'whatsapp_number' => $user->whatsapp_number, // Default ke nomor user jika ada
+                        'price_paid' => 0,
+                        'status' => 'pending',
+                    ]);
+                });
+            }
+
+            return response()->json([
+                'success' => true,
+                'registration_id' => $registration->id,
+                'message' => 'Registrasi berhasil dibuat'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error creating course registration: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Terjadi kesalahan saat memproses pendaftaran. Silakan coba lagi.'
             ], 500);
         }
     }

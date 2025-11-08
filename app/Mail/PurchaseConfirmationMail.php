@@ -36,9 +36,12 @@ class PurchaseConfirmationMail extends Mailable implements ShouldQueue
      */
     public function envelope()
     {
-        $subject = $this->type === 'ticket'
-            ? 'Terima Kasih telah Membeli Tiket - Motivatawa'
-            : 'Terima Kasih telah Membeli Video - Motivatawa';
+        $subject = match ($this->type) {
+            'ticket' => 'Terima Kasih telah Membeli Tiket - Motivatawa',
+            'registration' => 'Terima Kasih telah Mendaftar Course - Motivatawa',
+            'video' => 'Terima Kasih telah Membeli Video - Motivatawa',
+            default => 'Konfirmasi Pembelian - Motivatawa'
+        };
 
         return new Envelope(
             subject: $subject,

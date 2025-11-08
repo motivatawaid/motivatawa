@@ -86,7 +86,7 @@
                         <li><a href="{{ url('/all-event') }}"
                                 class="font-medium hover:text-primary transition-colors">Event</a></li>
                         <li><a href="{{ url('/all-course') }}"
-                                class="font-medium hover:text-primary transition-colors">Course</a></li>
+                                class="font-medium hover:text-primary transition-colors text-primary">Course</a></li>
                         <li><a href="{{ url('/all-video') }}"
                                 class="font-medium hover:text-primary transition-colors">Video</a></li>
                         <li><a href="{{ url('/') }}#features"
@@ -111,9 +111,10 @@
         <div class="container mx-auto px-4">
             <!-- Header Section -->
             <div class="text-center mb-12">
-                <h1 class="text-4xl lg:text-5xl font-bold text-dark mb-4">Semua Video Pembelajaran</h1>
-                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Tingkatkan pengetahuan dan keterampilan Anda dengan
-                    video pembelajaran premium dari para ahli</p>
+                <h1 class="text-4xl lg:text-5xl font-bold text-dark mb-4">Semua Course</h1>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Temukan course inspiratif yang sesuai dengan minat
+                    dan
+                    kebutuhan pengembangan diri Anda</p>
             </div>
 
             <!-- Search and Filter Section -->
@@ -121,19 +122,12 @@
                 <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
                     <div class="w-full md:w-64">
                         <div class="relative">
-                            <input type="text" id="searchInput" placeholder="Cari video..."
+                            <input type="text" id="searchInput" placeholder="Cari course..."
                                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                             <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                         </div>
                     </div>
                     <div class="flex gap-4">
-                        <select id="categoryFilter"
-                            class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            <option value="">Semua Kategori</option>
-                            <option value="business">Bisnis</option>
-                            <option value="technology">Teknologi</option>
-                            <option value="personal">Pengembangan Diri</option>
-                        </select>
                         <select id="sortFilter"
                             class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                             <option value="newest">Terbaru</option>
@@ -145,66 +139,79 @@
                 </div>
             </div>
 
-            <!-- Videos Grid -->
-            <div id="videosContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                @forelse ($videos as $video)
-                <div class="video-card bg-white rounded-xl shadow-lg overflow-hidden transition-all transform hover:-translate-y-2 hover:shadow-xl"
-                    data-title="{{ strtolower($video->title) }}" data-talent="{{ strtolower($video->talent->name) }}"
-                    data-price="{{ $video->price }}" data-date="{{ $video->created_at }}">
-                    <div class="relative">
-                        <img src="{{ $video->thumbnail ? asset('storage/' . $video->thumbnail) : 'https://placehold.co/600x400' }}"
-                            alt="{{ $video->title }}" class="w-full h-48 object-cover"
-                            onerror="this.src='https://placehold.co/600x400'">
-                        <div class="absolute top-4 right-4">
-                            <span
-                                class="inline-block px-3 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">
-                                <i class="fas fa-play mr-1"></i>Video
-                            </span>
-                        </div>
-                    </div>
+            <!-- Courses Grid -->
+            <div id="coursesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                @forelse ($courses as $course)
+                <div class="course-card bg-white rounded-xl shadow-lg overflow-hidden transition-all transform hover:-translate-y-2 hover:shadow-xl"
+                    data-name="{{ strtolower($course->name) }}"
+                    data-talent="{{ strtolower($course->talent->name ?? '') }}" data-price="{{ $course->price }}"
+                    data-date="{{ $course->created_at->timestamp }}" data-quota="{{ $course->remaining_quota }}">
+                    <img src="{{ $course->thumbnail ? asset('storage/' . $course->thumbnail) : 'https://placehold.co/600x400' }}"
+                        alt="{{ $course->name }}" class="w-full h-48 object-cover"
+                        onerror="this.src='https://placehold.co/600x400'">
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-dark mb-2">{{ $video->title }}</h3>
-                        <p class="text-gray-600 mb-4">Oleh: <span class="font-medium">{{ $video->talent->name }}</span>
-                        </p>
+                        @if($course->remaining_quota <= 0) <span
+                            class="inline-block px-3 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full mb-2">
+                            Kuota Habis
+                            </span>
+                            @elseif($course->remaining_quota <= 10) <span
+                                class="inline-block px-3 py-1 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full mb-2">
+                                Hampir Habis
+                                </span>
+                                @endif
 
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="text-primary font-bold text-lg">{{ $video->price_formatted }}</span>
-                            <span class="text-sm text-gray-500">Akses Selamanya</span>
-                        </div>
+                                <h3 class="text-xl font-bold text-dark mb-2">{{ $course->name }}</h3>
+                                <p class="text-gray-600 mb-4">Oleh: <span
+                                        class="font-medium">{{ $course->talent->name ?? 'Tidak tersedia' }}</span>
+                                </p>
 
-                        <div class="flex gap-2">
-                            <button onclick="openVideoModal({{ $video->id }})"
-                                class="flex-1 bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-yellow-600 transition-colors">
-                                Detail
-                            </button>
-                            @guest
-                            <a href="{{ url('/login') }}"
-                                class="flex-1 bg-dark text-white px-4 py-2 rounded-md font-medium hover:bg-gray-800 transition-colors text-center">
-                                Beli
-                            </a>
-                            @else
-                            @if(isset($video->is_purchased) && $video->is_purchased)
-                            <a href="{{ route('user.purchases.show', $video->purchase_id) }}"
-                                class="flex-1 bg-green-600 text-white px-4 py-2 rounded-md font-medium hover:bg-green-700 transition-colors text-center">
-                                Tonton Video
-                            </a>
-                            @else
-                            <button onclick="buyVideo({{ $video->id }})"
-                                class="flex-1 bg-dark text-white px-4 py-2 rounded-md font-medium hover:bg-gray-800 transition-colors">
-                                Beli
-                            </button>
-                            @endif
-                            @endguest
-                        </div>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-primary font-bold text-lg">{{ $course->price_formatted }}</span>
+                                    <span class="text-sm text-gray-500">
+                                        @if($course->remaining_quota <= 0) <span class="text-red-500">Kuota Habis</span>
+                                    @else
+                                    {{ $course->remaining_quota }} dari {{ $course->quota }} tersisa
+                                    @endif
+                                    </span>
+                                </div>
+
+                                <div class="flex gap-2">
+                                    <button onclick="openCourseModal({{ $course->id }})"
+                                        class="flex-1 bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-yellow-600 transition-colors">
+                                        Detail
+                                    </button>
+                                    @guest
+                                    <a href="{{ url('/login') }}"
+                                        class="flex-1 bg-dark text-white px-4 py-2 rounded-md font-medium hover:bg-gray-800 transition-colors text-center">
+                                        Daftar
+                                    </a>
+                                    @else
+                                    @if(isset($course->is_purchased) && $course->is_purchased)
+                                    <a href="{{ route('user.registrations.show', $course->registration_id) }}"
+                                        class="flex-1 bg-green-600 text-white px-4 py-2 rounded-md font-medium hover:bg-green-700 transition-colors text-center">
+                                        Lihat Registrasi
+                                    </a>
+                                    @elseif($course->remaining_quota <= 0) <button disabled
+                                        class="flex-1 bg-gray-400 text-white px-4 py-2 rounded-md font-medium cursor-not-allowed">
+                                        Kuota Habis
+                                        </button>
+                                        @else
+                                        <button onclick="buyCourse({{ $course->id }})"
+                                            class="flex-1 bg-dark text-white px-4 py-2 rounded-md font-medium hover:bg-gray-800 transition-colors">
+                                            Daftar
+                                        </button>
+                                        @endif
+                                        @endguest
+                                </div>
                     </div>
                 </div>
                 @empty
                 <div class="col-span-full text-center py-12">
                     <div class="text-gray-400 text-6xl mb-4">
-                        <i class="fas fa-video-slash"></i>
+                        <i class="fas fa-graduation-cap"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-600 mb-2">Belum ada video</h3>
-                    <p class="text-gray-500">Saat ini belum ada video pembelajaran yang tersedia.</p>
+                    <h3 class="text-xl font-bold text-gray-600 mb-2">Belum ada course</h3>
+                    <p class="text-gray-500">Saat ini belum ada course yang tersedia.</p>
                 </div>
                 @endforelse
             </div>
@@ -215,14 +222,14 @@
                     <i class="fas fa-search"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-600 mb-2">Tidak ada hasil</h3>
-                <p class="text-gray-500">Tidak ada video yang sesuai dengan pencarian Anda.</p>
+                <p class="text-gray-500">Tidak ada course yang sesuai dengan pencarian Anda.</p>
             </div>
 
             <!-- Pagination -->
-            @if($videos->hasPages())
+            @if($courses->hasPages())
             <div class="flex justify-center">
                 <div class="flex space-x-2">
-                    {{ $videos->links() }}
+                    {{ $courses->onEachSide(1)->links() }}
                 </div>
             </div>
             @endif
@@ -231,36 +238,39 @@
 
     @include('footer')
 
-    <!-- Video Modal -->
-    <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <!-- Course Modal -->
+    <div id="courseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-2xl font-bold text-dark" id="videoModalTitle">Video Title</h3>
-                    <button onclick="closeVideoModal()" class="text-gray-500 hover:text-gray-700">
+                    <h3 class="text-2xl font-bold text-dark" id="courseModalTitle">Course Title</h3>
+                    <button onclick="closeCourseModal()" class="text-gray-500 hover:text-gray-700">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
-                <img id="videoModalImage" src="https://placehold.co/600x400" alt="Video Thumbnail"
+                <img id="courseModalImage" src="https://placehold.co/600x400" alt="Course Image"
                     class="w-full h-64 object-cover rounded-lg mb-4" onerror="this.src='https://placehold.co/600x400'">
                 <div class="mb-4">
-                    <p class="text-gray-600 mb-2"><span class="font-medium">Penyelenggara:</span> <span
-                            id="videoModalTalent">Talent Name</span></p>
-                    <p class="text-gray-600 mb-4"><span class="font-medium">Harga:</span> <span id="videoModalPrice"
+                    <p class="text-gray-600 mb-2"><span class="font-medium">Pengajar:</span> <span
+                            id="courseModalTalent">Talent Name</span></p>
+                    <p class="text-gray-600 mb-2"><span class="font-medium">Kuota:</span> <span
+                            id="courseModalQuota">Quota</span> (<span id="courseModalRemainingQuota">Remaining</span>
+                        tersisa)</p>
+                    <p class="text-gray-600 mb-4"><span class="font-medium">Harga:</span> <span id="courseModalPrice"
                             class="text-primary font-bold">Price</span></p>
                 </div>
                 <div class="mb-6">
                     <h4 class="font-bold text-dark mb-2">Deskripsi</h4>
-                    <p id="videoModalDescription" class="text-gray-600">Video description goes here...</p>
+                    <p id="courseModalDescription" class="text-gray-600">Course description goes here...</p>
                 </div>
                 <div class="flex gap-3">
                     @guest
                     <a href="{{ url('/login') }}"
                         class="flex-1 bg-primary text-white px-4 py-3 rounded-md font-medium hover:bg-yellow-600 transition-colors text-center">
-                        Login untuk Membeli
+                        Login untuk Mendaftar
                     </a>
                     @else
-                    <div id="videoModalActionContainer">
+                    <div id="courseModalActionContainer">
                         <!-- Tombol akan di-generate oleh JavaScript -->
                     </div>
                     @endguest
@@ -273,7 +283,7 @@
     <div id="loadingSpinner" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg p-6 flex flex-col items-center">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
-            <p class="text-gray-700">Memproses pembelian...</p>
+            <p class="text-gray-700">Memproses pendaftaran...</p>
         </div>
     </div>
 
@@ -295,37 +305,42 @@
     </script>
 
     <script>
-        // Data videos dari Laravel
-        const videosData = @json($videos->items() ?? []);
+        // Data courses dari Laravel
+        const coursesData = @json($courses->items() ?? []);
+        
+        // Format price function
+        function formatPrice(price) {
+            if (typeof price !== 'number') {
+                price = parseFloat(price);
+                if (isNaN(price)) return 'Rp 0';
+            }
+            return 'Rp ' + price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
 
-        // Filter Functions - Simple Version
+        // Filter Functions
         function initializeFilters() {
             const searchInput = document.getElementById('searchInput');
-            const categoryFilter = document.getElementById('categoryFilter');
             const sortFilter = document.getElementById('sortFilter');
-            const videoCards = document.querySelectorAll('.video-card');
+            const courseCards = document.querySelectorAll('.course-card');
             const noResults = document.getElementById('noResults');
-            const videosContainer = document.getElementById('videosContainer');
+            const coursesContainer = document.getElementById('coursesContainer');
 
-            function filterVideos() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const categoryValue = categoryFilter.value;
+            function filterCourses() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
                 const sortValue = sortFilter.value;
                 
                 let visibleCards = [];
                 
-                // First: Filter cards
-                videoCards.forEach(card => {
-                    const title = card.getAttribute('data-title');
-                    const talent = card.getAttribute('data-talent');
+                courseCards.forEach(card => {
+                    const name = card.getAttribute('data-name') || '';
+                    const talent = card.getAttribute('data-talent') || '';
                     
                     // Search filter
-                    const matchesSearch = title.includes(searchTerm) || talent.includes(searchTerm);
+                    const matchesSearch = searchTerm === '' || 
+                                        name.includes(searchTerm) || 
+                                        talent.includes(searchTerm);
                     
-                    // Category filter
-                    const matchesCategory = !categoryValue; // All videos match for now
-                    
-                    if (matchesSearch && matchesCategory) {
+                    if (matchesSearch) {
                         card.style.display = 'block';
                         visibleCards.push(card);
                     } else {
@@ -336,110 +351,128 @@
                 // Show/hide no results message
                 if (visibleCards.length === 0) {
                     noResults.classList.remove('hidden');
-                    videosContainer.classList.add('hidden');
-                    return;
+                    coursesContainer.classList.add('hidden');
                 } else {
                     noResults.classList.add('hidden');
-                    videosContainer.classList.remove('hidden');
+                    coursesContainer.classList.remove('hidden');
+                    
+                    // Sort courses
+                    sortCourses(visibleCards, sortValue);
                 }
+            }
+
+            function sortCourses(cards, sortBy) {
+                const container = document.getElementById('coursesContainer');
                 
-                // Second: Sort visible cards
-                visibleCards.sort((a, b) => {
+                // Sort the cards array
+                cards.sort((a, b) => {
                     const aPrice = parseFloat(a.getAttribute('data-price')) || 0;
                     const bPrice = parseFloat(b.getAttribute('data-price')) || 0;
-                    const aDate = new Date(a.getAttribute('data-date')).getTime() || 0;
-                    const bDate = new Date(b.getAttribute('data-date')).getTime() || 0;
+                    const aDate = parseInt(a.getAttribute('data-date')) || 0;
+                    const bDate = parseInt(b.getAttribute('data-date')) || 0;
                     
-                    switch(sortValue) {
+                    switch(sortBy) {
                         case 'newest':
-                            return bDate - aDate;
+                            return bDate - aDate; // Descending date
                         case 'oldest':
-                            return aDate - bDate;
+                            return aDate - bDate; // Ascending date
                         case 'price_low':
-                            return aPrice - bPrice;
+                            return aPrice - bPrice; // Ascending price
                         case 'price_high':
-                            return bPrice - aPrice;
+                            return bPrice - aPrice; // Descending price
                         default:
                             return 0;
                     }
                 });
 
-                // Third: Reorder in DOM
-                const container = document.getElementById('videosContainer');
-                
-                // Remove all visible cards temporarily
-                visibleCards.forEach(card => {
-                    container.removeChild(card);
-                });
-                
-                // Re-append in sorted order
-                visibleCards.forEach(card => {
+                // Reorder cards in DOM
+                cards.forEach(card => {
                     container.appendChild(card);
                 });
             }
 
-            // Event listeners
-            searchInput.addEventListener('input', filterVideos);
-            categoryFilter.addEventListener('change', filterVideos);
-            sortFilter.addEventListener('change', filterVideos);
+            // Event listeners dengan debounce untuk search
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(filterCourses, 300);
+            });
             
-            // Initialize
-            filterVideos();
+            sortFilter.addEventListener('change', filterCourses);
+            
+            // Initialize filters
+            filterCourses();
         }
-        // Video Modal Functions
-        function openVideoModal(videoId) {
-            const video = videosData.find(v => v.id === videoId);
+
+        // Course Modal Functions
+        function openCourseModal(courseId) {
+            const course = coursesData.find(c => c.id === courseId);
             
-            if (!video) {
-                showNotification('error', 'Error', 'Video tidak ditemukan');
+            if (!course) {
+                showNotification('error', 'Error', 'Course tidak ditemukan');
                 return;
             }
             
-            document.getElementById('videoModalTitle').textContent = video.title || 'Tidak tersedia';
-            document.getElementById('videoModalTalent').textContent = video.talent ? video.talent.name : 'Tidak tersedia';
-            document.getElementById('videoModalPrice').textContent = video.price_formatted || formatPrice(video.price);
-            document.getElementById('videoModalDescription').textContent = video.description || 'Tidak ada deskripsi';
+            document.getElementById('courseModalTitle').textContent = course.name || 'Tidak tersedia';
+            document.getElementById('courseModalTalent').textContent = course.talent ? course.talent.name : 'Tidak tersedia';
+            document.getElementById('courseModalQuota').textContent = `${course.quota || 0} Peserta`;
+            document.getElementById('courseModalRemainingQuota').textContent = `${course.remaining_quota || 0}`;
+            document.getElementById('courseModalPrice').textContent = course.price_formatted || formatPrice(course.price);
+            document.getElementById('courseModalDescription').textContent = course.description || 'Tidak ada deskripsi';
             
-            const videoImage = document.getElementById('videoModalImage');
-            if (video.thumbnail) {
-                videoImage.src = `/storage/${video.thumbnail}`;
+            const courseImage = document.getElementById('courseModalImage');
+            if (course.thumbnail) {
+                courseImage.src = `/storage/${course.thumbnail}`;
             } else {
-                videoImage.src = 'https://placehold.co/600x400';
+                courseImage.src = 'https://placehold.co/600x400';
             }
             
-            const actionContainer = document.getElementById('videoModalActionContainer');
+            const actionContainer = document.getElementById('courseModalActionContainer');
             if (actionContainer) {
                 actionContainer.innerHTML = '';
-                
-                if (video.is_purchased) {
-                    const watchVideoBtn = document.createElement('a');
-                    watchVideoBtn.href = `/user/purchases/${video.purchase_id}`;
-                    watchVideoBtn.className = 'flex-1 bg-green-600 text-white px-4 py-3 rounded-md font-medium hover:bg-green-700 transition-colors text-center';
-                    watchVideoBtn.textContent = 'Tonton Video';
-                    actionContainer.appendChild(watchVideoBtn);
+            
+                if (course.is_purchased) {
+                    const viewRegistrationBtn = document.createElement('a');
+                    viewRegistrationBtn.href = `/user/registrations/${course.registration_id}`;
+                    viewRegistrationBtn.className = 'flex-1 bg-green-600 text-white px-4 py-3 rounded-md font-medium hover:bg-green-700 transition-colors text-center';
+                    viewRegistrationBtn.textContent = 'Lihat Registrasi';
+                    actionContainer.appendChild(viewRegistrationBtn);
+                } else if (course.remaining_quota <= 0) {
+                    const soldOutBtn = document.createElement('button');
+                    soldOutBtn.className = 'flex-1 bg-gray-400 text-white px-4 py-3 rounded-md font-medium cursor-not-allowed';
+                    soldOutBtn.textContent = 'Kuota Habis';
+                    soldOutBtn.disabled = true;
+                    actionContainer.appendChild(soldOutBtn);
                 } else {
-                    const buyBtn = document.createElement('button');
-                    buyBtn.className = 'flex-1 bg-primary text-white px-4 py-3 rounded-md font-medium hover:bg-yellow-600 transition-colors';
-                    buyBtn.textContent = 'Beli Video';
-                    buyBtn.setAttribute('onclick', `buyVideo(${videoId})`);
-                    actionContainer.appendChild(buyBtn);
+                    const registerBtn = document.createElement('button');
+                    registerBtn.className = 'flex-1 bg-primary text-white px-4 py-3 rounded-md font-medium hover:bg-yellow-600 transition-colors';
+                    registerBtn.textContent = 'Daftar Course';
+                    registerBtn.setAttribute('onclick', `buyCourse(${courseId})`);
+                    actionContainer.appendChild(registerBtn);
                 }
             }
             
-            document.getElementById('videoModal').classList.remove('hidden');
+            document.getElementById('courseModal').classList.remove('hidden');
         }
 
-        function closeVideoModal() {
-            document.getElementById('videoModal').classList.add('hidden');
+        function closeCourseModal() {
+            document.getElementById('courseModal').classList.add('hidden');
         }
 
-        // Buy Video Function
-        async function buyVideo(videoId) {
+        // Buy Course Function
+        async function buyCourse(courseId) {
+            // Cek kuota terlebih dahulu
+            const course = coursesData.find(c => c.id === courseId);
+            if (course && course.remaining_quota <= 0) {
+                showNotification('error', 'Kuota Habis', 'Maaf, kuota untuk course ini sudah habis.');
+                return;
+            }
+
             document.getElementById('loadingSpinner').classList.remove('hidden');
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             
             try {
-                const createPurchaseResponse = await fetch(`/video/${videoId}/create-purchase`, {
+                const createRegistrationResponse = await fetch(`/course/${courseId}/create-registration`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
@@ -448,10 +481,22 @@
                     }
                 });
 
-                const purchaseData = await createPurchaseResponse.json();
+                const registrationData = await createRegistrationResponse.json();
 
-                if (!purchaseData.success) {
-                    throw new Error(purchaseData.error || 'Gagal membuat purchase');
+                // TAMBAHKAN PENANGANAN REDIRECT DI SINI
+                if (!registrationData.success) {
+                    // Cek jika ada redirect_url (whatsapp_number NULL)
+                    if (registrationData.redirect_url) {
+                        document.getElementById('loadingSpinner').classList.add('hidden');
+                        showNotification('error', 'Data Belum Lengkap', registrationData.error || 'Silakan lengkapi profil Anda terlebih dahulu.');
+                        
+                        // Redirect ke halaman profile setelah 3 detik
+                        setTimeout(() => {
+                            window.location.href = registrationData.redirect_url;
+                        }, 3000);
+                        return;
+                    }
+                    throw new Error(registrationData.error || 'Gagal membuat registrasi');
                 }
 
                 const paymentResponse = await fetch('{{ route("payment.snap-token") }}', {
@@ -462,8 +507,8 @@
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        type: 'video',
-                        item_id: purchaseData.purchase_id
+                        type: 'registration',
+                        item_id: registrationData.registration_id
                     })
                 });
 
@@ -473,12 +518,12 @@
                 if (paymentData.success && paymentData.snap_token) {
                     snap.pay(paymentData.snap_token, {
                         onSuccess: function(result) {
-                            handlePaymentSuccess(result.order_id, csrfToken, 'video');
+                            handlePaymentSuccess(result.order_id, csrfToken, 'course');
                         },
                         onPending: function(result) {
                             showNotification('info', 'Pembayaran Pending', 'Silakan lanjutkan pembayaran Anda');
                             setTimeout(() => {
-                                window.location.href = '{{ route("user.purchases.index") }}';
+                                window.location.href = '{{ route("user.registrations.index") }}';
                             }, 2000);
                         },
                         onError: function(result) {
@@ -494,19 +539,11 @@
             } catch (error) {
                 console.error('Checkout Error:', error);
                 document.getElementById('loadingSpinner').classList.add('hidden');
-                showNotification('error', 'Error', error.message || 'Terjadi kesalahan saat memproses pembelian.');
+                showNotification('error', 'Error', error.message || 'Terjadi kesalahan saat memproses pendaftaran.');
             }
         }
 
         // Helper Functions
-        function formatPrice(price) {
-            if (typeof price !== 'number') {
-                price = parseFloat(price);
-                if (isNaN(price)) return 'Rp 0';
-            }
-            return 'Rp ' + price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-
         async function handlePaymentSuccess(orderId, csrfToken, type) {
             try {
                 const syncResponse = await fetch('{{ route("payment.verify-status") }}', {
@@ -522,16 +559,16 @@
                 const syncData = await syncResponse.json();
                 
                 if (syncData.success && syncData.status === 'success') {
-                    showNotification('success', 'Pembayaran Berhasil', 'Akses video Anda telah aktif!');
+                    showNotification('success', 'Pembayaran Berhasil', 'Registrasi course Anda telah aktif!');
                 } else {
-                    showNotification('info', 'Pembayaran Berhasil', 'Status video sedang diproses. Cek riwayat pembelian.');
+                    showNotification('info', 'Pembayaran Berhasil', 'Status registrasi sedang diproses. Cek riwayat pendaftaran.');
                 }
             } catch (syncError) {
                 console.error('Sync Error:', syncError);
-                showNotification('success', 'Pembayaran Berhasil', 'Akses video Anda telah aktif!');
+                showNotification('success', 'Pembayaran Berhasil', 'Registrasi course Anda telah aktif!');
             } finally {
                 setTimeout(() => {
-                    window.location.href = '{{ route("user.purchases.index") }}';
+                    window.location.href = '{{ route("user.registrations.index") }}';
                 }, 2000);
             }
         }
@@ -565,9 +602,9 @@
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-            const videoModal = document.getElementById('videoModal');
-            if (event.target == videoModal) {
-                videoModal.classList.add('hidden');
+            const courseModal = document.getElementById('courseModal');
+            if (event.target == courseModal) {
+                courseModal.classList.add('hidden');
             }
         }
 

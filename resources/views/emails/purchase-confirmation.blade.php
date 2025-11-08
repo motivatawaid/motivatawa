@@ -142,6 +142,20 @@
             color: #1a1a1a;
             margin-bottom: 10px;
         }
+
+        .type-info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .type-info p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -178,6 +192,8 @@
                     <strong>Jenis:</strong>
                     @if($type === 'ticket')
                     🎫 Tiket Event
+                    @elseif($type === 'registration')
+                    🎓 Course / Kelas
                     @else
                     🎬 Video Edukasi
                     @endif
@@ -195,6 +211,24 @@
                     <strong>Status:</strong> <span style="color: #10b981; font-weight: 600;">Berhasil</span>
                 </div>
             </div>
+
+            <!-- Informasi khusus berdasarkan tipe -->
+            @if($type === 'ticket')
+            <div class="type-info">
+                <p><strong>🎫 Informasi Tiket Event:</strong> Tiket Anda telah aktif! Silakan cek di halaman "Tiket
+                    Saya" untuk detail event dan informasi akses.</p>
+            </div>
+            @elseif($type === 'registration')
+            <div class="type-info">
+                <p><strong>🎓 Informasi Course:</strong> Pendaftaran course Anda telah aktif! Anda sekarang memiliki
+                    akses penuh ke materi course. Silakan cek di halaman "Registrasi Saya" untuk mulai belajar.</p>
+            </div>
+            @else
+            <div class="type-info">
+                <p><strong>🎬 Informasi Video:</strong> Video telah tersedia di library Anda! Anda dapat menontonnya
+                    kapan saja melalui halaman "Video Saya".</p>
+            </div>
+            @endif
 
             <div class="motivatawa-info">
                 <h3>🌟 Tentang Motivatawa</h3>
@@ -217,6 +251,24 @@
                 <a href="{{ url('/') }}" class="button">
                     🚀 Kunjungi Motivatawa
                 </a>
+            </div>
+
+            <!-- Link khusus berdasarkan tipe -->
+            <div style="text-align: center; margin: 20px 0;">
+                @if($type === 'ticket')
+                <a href="{{ url('/my/tickets') }}" style="color: #ddb748; text-decoration: none; font-size: 14px;">
+                    📋 Lihat Tiket Saya
+                </a>
+                @elseif($type === 'registration')
+                <a href="{{ url('/my/registrations') }}"
+                    style="color: #ddb748; text-decoration: none; font-size: 14px;">
+                    🎓 Lihat Registrasi Saya
+                </a>
+                @else
+                <a href="{{ url('/my/purchases') }}" style="color: #ddb748; text-decoration: none; font-size: 14px;">
+                    🎬 Lihat Video Saya
+                </a>
+                @endif
             </div>
 
             <div style="text-align: center; font-size: 14px; color: #666; margin-top: 20px;">

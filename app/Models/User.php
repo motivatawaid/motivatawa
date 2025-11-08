@@ -22,6 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'whatsapp_number',
         'role',
         'username',
         'password',
@@ -51,6 +52,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function tickets()
     {
         return $this->hasMany(\App\Models\Ticket::class);
+    }
+
+    public function registrations()
+    {
+        return $this->hasMany(\App\Models\Registration::class);
     }
 
     // Relasi: User punya banyak Purchase
