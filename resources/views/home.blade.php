@@ -239,28 +239,51 @@
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl lg:text-4xl font-bold text-dark mb-4">Tentang Motivatawa</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Platform Edutainment yang menggabungkan motivasi dan
-                    tawa untuk pengembangan diri yang menyenangkan</p>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                    Platform khusus yang menyediakan layanan <strong>Edutainment</strong> (Edukasi dan Entertainment)
+                </p>
             </div>
+
             <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Gambar -->
                 <div class="order-2 lg:order-1">
                     <img src="{{ asset('assets/img/hero.png') }}" alt="Tentang Motivatawa"
                         class="rounded-xl shadow-2xl w-full h-96 object-cover">
                 </div>
+
+                <!-- Teks Konten -->
                 <div class="order-1 lg:order-2 prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6">
                     <p>Perpaduan <strong>Edukasi</strong> dan <strong>Entertainment</strong> diharapkan mampu menjadi
                         jalan yang baik untuk masyarakat Indonesia.</p>
-                    <p>Banyak program yang akan kami siapkan. Ada seminar, workshop, kelas Bergaransi, Show serta event
-                        - event yang berkaitan dengan Edutainment.</p>
-                    <p><strong>Motivatawa</strong> berasal dari dua kata yaitu <em>Motivasi</em> dan <em>Tawa</em>.</p>
-                    <p>Dengan harapan kedepannya, orang bisa belajar dengan santai namun hasilnya tetap serius karena
+
+                    <p><strong>Motivatawa</strong> Memiliki layanan yang khusus berfokus pada pelatihan <strong>Public
+                            Speaking</strong>.<br>
+                        "<em>The Unique Public Speaking School</em>" adalah tagline yang kami usung sebagai penggambaran
+                        secara umum tentang pelatihan Public Speaking di Motivatawa.</p>
+
+                    <p>Layanan ini tentunya disediakan untuk:<br>
+                        <strong>SD • SMP • SMA • Mahasiswa • Alumni • Profesional</strong>
+                    </p>
+
+                    <p>Selain itu, banyak program yang akan kami siapkan. Ada <strong>seminar, workshop, kelas
+                            bergaransi, show,</strong> serta <strong>event-event</strong> yang berkaitan dengan
+                        Edutainment.</p>
+
+                    <p><strong>Motivatawa</strong> berasal dari dua kata, yaitu <em>Motivasi</em> dan <em>Tawa</em>.<br>
+                        Dengan harapan ke depannya, orang bisa belajar dengan santai namun hasilnya tetap serius karena
                         prosesnya dijalani dengan kebahagiaan.</p>
-                    <p>Di platform ini juga para pengajar/tutor/narasumber/komika/public speaker/singer atau siapapun
-                        yang terlibat di bidang edukasi dan Entertainment bisa menitipkan produknya untuk dijual berupa
-                        video pembelajaran ataupun tiket event juga show/kelas mereka.</p>
-                    <p>Semoga <strong>MOTIVATAWA</strong> bisa menjadi platform yang bermanfaat untuk banyak orang,
-                        terkhusus bagi mereka yang ingin belajar public speaking/digital marketing/personal branding
-                        atau hal-hal lainnya yang berkaitan dengan self development (pengembangan diri).</p>
+
+                    <p>Di platform ini juga para pengajar, tutor, narasumber, komika, public speaker, singer, atau
+                        siapapun yang terlibat di bidang edukasi dan entertainment bisa menitipkan produknya untuk
+                        dijual — berupa video pembelajaran, tiket event, maupun show/kelas mereka.</p>
+
+                    <p class="text-lg font-medium">Semoga <strong>MOTIVATAWA</strong> bisa menjadi platform yang
+                        bermanfaat bagi banyak orang, terkhusus bagi mereka yang ingin belajar <strong>public speaking,
+                            digital marketing, personal branding,</strong> atau hal-hal lainnya yang berkaitan dengan
+                        <em>self development</em> (pengembangan diri).
+                    </p>
+
+                    <p class="text-lg font-semibold text-primary">Terima kasih</p>
                 </div>
             </div>
         </div>
