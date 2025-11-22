@@ -2,14 +2,14 @@
 <footer id="contact" class="bg-dark text-white py-16">
     <div class="container mx-auto px-4">
         <div
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 justify-items-start md:justify-items-center">
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-12 justify-items-start md:justify-items-center">
             <div>
-                <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-primary inline-block">Tentang Motivatawa</h3>
-                <h4 class="text-lg font-semibold text-primary mb-3">Motivasi untuk Inspirasi dan Tawa Adalah Senjata
-                </h4>
+                <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-primary inline-block">Motivatawa</h3>
                 <p class="text-gray-300 mb-4 italic">
-                    Hidup kadang serius banget, sampai lupa ketawa. Di sini, kamu nggak cuma dapat motivasi, tapi juga
-                    alasan buat senyum lagi
+                    Platform Edutainment Pertama di Indonesia
+                    Gabungan sempurna antara Edukasi dan Entertainment untuk pengalaman belajar yang menyenangkan.
+                    Belajar santai dengan metode interaktif, namun dengan hasil yang serius untuk pengembangan diri
+                    Anda.
                 </p>
                 <div class="flex space-x-4">
                     <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
@@ -31,25 +31,11 @@
                 </div>
             </div>
             <div>
-                <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-primary inline-block">Fitur</h3>
-                <ul class="space-y-3">
-                    <li><a href="{{ url('/all-event') }}"
-                            class="text-gray-300 hover:text-primary transition-colors">Pembelian Tiket
-                            Online</a></li>
-                    <li><a href="{{ url('/all-video') }}"
-                            class="text-gray-300 hover:text-primary transition-colors">Video
-                            Pembelajaran</a></li>
-                    <li><a href="{{ url('/dashboard') }}"
-                            class="text-gray-300 hover:text-primary transition-colors">Riwayat
-                            Pembelian</a></li>
-                </ul>
-            </div>
-            <div>
                 <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-primary inline-block">Hubungi Kami</h3>
                 <ul class="space-y-4">
                     <li class="flex items-start">
                         <i class="fas fa-map-marker-alt text-primary mt-1 mr-3"></i>
-                        <span class="text-gray-300">Jawa Barat, Indonesia</span>
+                        <span class="text-gray-300">Jalan Raya Jatiwaringin 8, Jakarta Timur, 13620</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-phone text-primary mr-3"></i>

@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\RegistrationController;
@@ -35,6 +36,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/all-event', [HomeController::class, 'allEvent'])->name('all-event');
 Route::get('/all-course', [HomeController::class, 'allCourse'])->name('all-course');
 Route::get('/all-video', [HomeController::class, 'allVideo'])->name('all-video');
+Route::get('/all-news', [HomeController::class, 'allNews'])->name('all-news');
+
+// Route untuk detail news dengan slug
+Route::get('/articles-news/{slug}', [HomeController::class, 'getNews'])->name('article-news.show');
 
 // Route untuk pembelian dari home
 Route::post('/event/{event}/create-ticket', [HomeController::class, 'createEventTicket'])
@@ -76,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'registrations' => RegistrationController::class,
             'videos' => VideoController::class,
             'purchases' => PurchaseController::class,
+            'news' => NewsController::class,
         ]);
     });
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Event;
+use App\Models\News;
 use App\Models\Purchase;
 use App\Models\Registration;
 use App\Models\Ticket;
@@ -26,90 +27,17 @@ class HomeController extends Controller
     }
 
     /**
-     * Tampilkan halaman utama dengan event, course dan video terbaru
+     * Tampilkan halaman utama dengan news terbaru
      */
     public function index(Request $request)
     {
-        // Ambil event terbaru yang akan datang (batasi 6)
-        $upcomingEvents = Event::where('start_date', '>=', now())
-            ->with(['talent', 'tickets' => function ($query) {
-                $query->where('status', 'purchased');
-            }])
-            ->orderBy('start_date', 'asc')
-            ->take(6)
+        // Ambil 3 news terbaru yang sudah dipublikasikan
+        $latestNews = News::whereNotNull('published_at')
+            ->orderBy('published_at', 'desc')
+            ->take(3)
             ->get();
 
-        // Ambil course terbaru (batasi 6)
-        $latestCourses = Course::with(['talent', 'registrations' => function ($query) {
-            $query->where('status', 'purchased');
-        }])
-            ->orderBy('created_at', 'desc')
-            ->take(6)
-            ->get();
-
-        // Ambil video terbaru (batasi 6)
-        $latestVideos = Video::orderBy('created_at', 'desc')
-            ->take(6)
-            ->get();
-
-        // Jika user sudah login, cek status pembelian
-        if ($request->user()) {
-            $user = $request->user();
-
-            // Tambahkan status pembelian untuk setiap event
-            $upcomingEvents->each(function ($event) use ($user) {
-                $ticket = $user->tickets()
-                    ->where('event_id', $event->id)
-                    ->where('status', 'purchased')
-                    ->first();
-
-                $event->is_purchased = $ticket ? true : false;
-                $event->ticket_id = $ticket ? $ticket->id : null;
-
-                // Hitung sisa quota
-                $event->remaining_quota = $event->remaining_quota;
-                $event->sold_tickets = $event->sold_tickets;
-            });
-
-            // Tambahkan status pembelian untuk setiap course
-            $latestCourses->each(function ($course) use ($user) {
-                $registration = $user->registrations()
-                    ->where('course_id', $course->id)
-                    ->where('status', 'purchased')
-                    ->first();
-
-                $course->is_purchased = $registration ? true : false;
-                $course->registration_id = $registration ? $registration->id : null;
-
-                // Hitung sisa quota
-                $course->remaining_quota = $course->remaining_quota;
-                $course->sold_registrations = $course->sold_registrations;
-            });
-
-            // Tambahkan status pembelian untuk setiap video
-            $latestVideos->each(function ($video) use ($user) {
-                $purchase = $user->purchases()
-                    ->where('video_id', $video->id)
-                    ->where('status', 'purchased')
-                    ->first();
-
-                $video->is_purchased = $purchase ? true : false;
-                $video->purchase_id = $purchase ? $purchase->id : null;
-            });
-        } else {
-            // Untuk guest, tetap hitung sisa quota
-            $upcomingEvents->each(function ($event) {
-                $event->remaining_quota = $event->remaining_quota;
-                $event->sold_tickets = $event->sold_tickets;
-            });
-
-            $latestCourses->each(function ($course) {
-                $course->remaining_quota = $course->remaining_quota;
-                $course->sold_registrations = $course->sold_registrations;
-            });
-        }
-
-        return view('home', compact('upcomingEvents', 'latestCourses', 'latestVideos'));
+        return view('home', compact('latestNews'));
     }
 
     /**
@@ -208,6 +136,29 @@ class HomeController extends Controller
         }
 
         return view('videos.all', compact('videos'));
+    }
+
+    /** Semua Berita */
+    public function allNews()
+    {
+        $news = News::whereNotNull('published_at')
+            ->with('author')
+            ->orderBy('published_at', 'desc')
+            ->paginate(12);
+
+        return view('news.all', compact('news'));
+    }
+
+    /** Detail Berita berdasarkan Slug */
+    public function getNews(string $slug)
+    {
+        $news = News::whereNotNull('published_at')
+            ->with('author')
+            ->where('slug', $slug)
+            ->orderBy('published_at', 'desc')
+            ->firstOrFail();
+
+        return view('news.show', compact('news'));
     }
 
     /**

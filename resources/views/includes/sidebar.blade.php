@@ -68,6 +68,12 @@
                 <span>Kelola Purchases</span>
             </a>
         </li>
+        <li class="{{ request()->routeIs('news.*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('news.index') }}">
+                <i class="fas fa-newspaper"></i>
+                <span>Kelola News</span>
+            </a>
+        </li>
         @endcan
 
         {{-- sidebar user --}}

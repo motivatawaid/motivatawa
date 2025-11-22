@@ -89,8 +89,12 @@
                                 class="font-medium hover:text-primary transition-colors text-primary">Course</a></li>
                         <li><a href="{{ url('/all-video') }}"
                                 class="font-medium hover:text-primary transition-colors">Video</a></li>
+                        <li><a href="{{ url('/all-news') }}"
+                                class="font-medium hover:text-primary transition-colors">Berita</a></li>
                         <li><a href="{{ url('/') }}#features"
                                 class="font-medium hover:text-primary transition-colors">Fitur</a></li>
+                        <li><a href="{{ url('/') }}#about"
+                                class="font-medium hover:text-primary transition-colors">Tentang</a></li>
                         <li><a href="{{ url('/') }}#contact"
                                 class="font-medium hover:text-primary transition-colors">Kontak</a></li>
                     </ul>
@@ -147,7 +151,7 @@
                     data-talent="{{ strtolower($course->talent->name ?? '') }}" data-price="{{ $course->price }}"
                     data-date="{{ $course->created_at->timestamp }}" data-quota="{{ $course->remaining_quota }}">
                     <img src="{{ $course->thumbnail ? asset('storage/' . $course->thumbnail) : 'https://placehold.co/600x400' }}"
-                        alt="{{ $course->name }}" class="w-full h-48 object-cover"
+                        alt="{{ $course->name }}" class="w-full aspect-[30/67] object-cover"
                         onerror="this.src='https://placehold.co/600x400'">
                     <div class="p-6">
                         @if($course->remaining_quota <= 0) <span
