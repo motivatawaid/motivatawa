@@ -105,8 +105,6 @@
                                 class="font-medium hover:text-primary transition-colors">Video</a></li>
                         <li><a href="{{ url('/all-news') }}"
                                 class="font-medium hover:text-primary transition-colors text-primary">Berita</a></li>
-                        <li><a href="{{ url('/') }}#features"
-                                class="font-medium hover:text-primary transition-colors">Fitur</a></li>
                         <li><a href="{{ url('/') }}#about"
                                 class="font-medium hover:text-primary transition-colors">Tentang</a></li>
                         <li><a href="{{ url('/') }}#contact"
